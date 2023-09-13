@@ -24,6 +24,7 @@ export default function RootLayout({ children }) {
             {" "}
             rawg.io
           </a>
+          . Deployed to Vercel.
         </footer>
       </body>
     </html>
