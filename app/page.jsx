@@ -1,30 +1,44 @@
 import Heading from "@/components/Heading";
-import { getFeaturedReview } from "@/lib/reviews";
+import { getReviews } from "@/lib/reviews";
+import Image from "next/image";
 import Link from "next/link";
 
+export const revalidate = 30; // seconds
+
 export default async function HomePage() {
-  console.log("[Homepage] rendering");
-  const { slug, title, date, image } = await getFeaturedReview();
+  const { reviews } = await getReviews(3);
 
   return (
     <>
       <Heading>Indie Gamer</Heading>
       <p className="pb-3">Only the best indie games, reviewed for you.</p>
-      <div className="w-80 rounded border bg-white shadow hover:shadow-xl sm:w-full">
-        <Link href={`/reviews/${slug}`} className="flex flex-col sm:flex-row">
-          {" "}
-          <img
-            className="rounded-t sm:rounded-l sm:rounded-r-none"
-            src={`/images/${slug}.jpg`}
-            alt=""
-            width="320"
-            height="180"
-          />
-          <h2 className="py-1 text-center font-orbitron font-semibold sm:px-2">
-            {title}
-          </h2>
-        </Link>
-      </div>
+      <ul className="flex flex-col gap-3">
+        {reviews.map((review, index) => (
+          <li
+            key={review.slug}
+            className="w-80 rounded border bg-white shadow hover:shadow-xl sm:w-full"
+          >
+            <Link
+              href={`/reviews/${review.slug}`}
+              className="flex flex-col sm:flex-row"
+            >
+              {" "}
+              <Image
+                className="rounded-t sm:rounded-l sm:rounded-r-none"
+                src={review.image}
+                alt=""
+                width="320"
+                height="180"
+                priority={index === 0 || index === 1}
+              />
+              <div className="sm: flex flex-col px-2 py-1 text-center sm:text-left">
+                <h2 className=" font-orbitron font-semibold">{review.title}</h2>
+                <p className="hidden pt-2 sm:block">{review.subtitle}</p>
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </>
   );
 }
